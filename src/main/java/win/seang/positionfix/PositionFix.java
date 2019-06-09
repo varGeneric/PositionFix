@@ -37,7 +37,10 @@ public class PositionFix {
                 .description(Text.EMPTY)
                 .extendedDescription(Text.EMPTY)
                 .arguments(
-                        GenericArguments.allOf(GenericArguments.uuid(Text.of("player")))
+                        GenericArguments.firstParsing(
+                                GenericArguments.uuid(Text.of("Player UUID")),
+                                GenericArguments.string(Text.of("Player name"))
+                        )
                 )
                 .permission("fixposition.command.fix")
                 .executor(new FixPlayerCommand())

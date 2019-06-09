@@ -24,14 +24,16 @@ import org.spongepowered.api.world.World;
 public class FixPlayerCommand implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext context) throws CommandException {
-        UUID uuid;
-        if (context.<UUID>getOne("player").isPresent())
-            uuid = context.<UUID>getOne("player").get();
+        Optional<UserStorageService> userStorage = Sponge.getServiceManager().provide(UserStorageService.class);
+        Optional<User> userTarget;
+        if (context.<UUID>getOne("Player UUID").isPresent()) {
+            userTarget = userStorage.get().get(context.<UUID>getOne("Player UUID").get());
+        }
+        else if (context.<String>getOne("Player name").isPresent()) {
+            userTarget = userStorage.get().get(context.<String>getOne("Player name").get());
+        }
         else
             throw new CommandException(Text.EMPTY, true);
-        Optional<UserStorageService> userStorage = Sponge.getServiceManager().provide(UserStorageService.class);
-        Optional<User> userTarget = userStorage.get().get(uuid);
-        src.sendMessage(Text.of(uuid.toString()));
         userTarget.ifPresent(player -> src.sendMessage(Text.of("User Target Name: " + player.getName())));
 
         if (userTarget.isPresent() && !userTarget.get().isOnline()) {
@@ -48,10 +50,10 @@ public class FixPlayerCommand implements CommandExecutor {
             }
             */
             // ouch very hacky
-            userTarget.get().setLocation(new Vector3d(0, 0, 0), Sponge.getServer().getWorld("world").get().getUniqueId());
+            userTarget.get().setLocation(new Vector3d(0, 70, 0), Sponge.getServer().getWorld("world").get().getUniqueId());
         }
         else
-            throw new CommandException(Text.EMPTY, true);
+            throw new CommandException(Text.of("User not found. "), true);
 
         return CommandResult.success();
     }
